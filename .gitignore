@@ -2,10 +2,13 @@
 __pycache__/
 *.py[cod]
 *$py.class
+API/node_modules/
+myenv/
+venv/
 
 # C extensions
 *.so
-
+.idea/
 # Distribution / packaging
 .Python
 build/
@@ -120,7 +123,7 @@ celerybeat.pid
 *.sage.py
 
 # Environments
-.env
+example_for_dot_env
 .venv
 env/
 venv/
