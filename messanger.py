@@ -9,6 +9,7 @@ from urllib.parse import quote  # Uncomment line below to use python 3
 from selenium import webdriver
 from selenium.webdriver import Keys
 from selenium.webdriver.common.by import By
+from selenium.webdriver.firefox.options import Options
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.wait import WebDriverWait
 
@@ -18,17 +19,25 @@ load_dotenv()  # take environment variables from example_for_dot_env.
 
 
 class Messanger:
-    def __init__(self, timeout_waiting=7):
+    def __init__(self, timeout_waiting=20):
         self.timeout_waiting = timeout_waiting  # timeout waiting for msg status to be sent
 
+        firefox_options = Options()
+        # firefox_options.set_preference("permissions.default.image", 2)  # 2 means block images
+
+
+        ff_profile = webdriver.FirefoxProfile('profile')
+
         if platform.system() == "Linux":
-            self.driver = webdriver.Firefox()
+            self.driver = webdriver.Firefox(options=firefox_options)
         elif platform.system() == "Windows":
             geckodriver_path = os.getenv('GECKODRIVER_PATH')
             firefox_binary = os.getenv('FIREFOX_BIN')
 
             self.driver = webdriver.Firefox(executable_path=geckodriver_path,
-                                            firefox_binary=firefox_binary)
+                                            firefox_binary=firefox_binary,
+                                            options=firefox_options,
+                                            firefox_profile=ff_profile)
 
         self.driver.maximize_window()
         self.wait5 = WebDriverWait(self.driver, 5)
@@ -80,7 +89,9 @@ class Messanger:
                 return "timeout"
 
             n_sent_checkmarks = len(self.driver.find_elements(By.CSS_SELECTOR, sent_msg_status_selector))
+            print(n_sent_checkmarks)
             n_dlvrd_or_read_checkmarks = len(self.driver.find_elements(By.CSS_SELECTOR, dlvrd_or_read_msg_status_selector))
+            print(n_dlvrd_or_read_checkmarks)
 
             time.sleep(random.uniform(0, 0.3))  # sleep random time between 0 and 0.3 seconds
             self.driver.find_element(By.CSS_SELECTOR, message_input_selector).send_keys(Keys.ENTER)
@@ -91,9 +102,22 @@ class Messanger:
                     .until(lambda driver: len(driver.find_elements(By.CSS_SELECTOR, sent_msg_status_selector)) > n_sent_checkmarks
                                           or len(driver.find_elements(By.CSS_SELECTOR, dlvrd_or_read_msg_status_selector)) > n_dlvrd_or_read_checkmarks)
                 return "sent"
-            except:
+            except Exception as e:
+                print(e)
                 return "timeout"
 
 
-        except:
+        except Exception as e:
+            print(e)
             return "failed"
+
+
+if __name__ == "__main__":
+    m = Messanger()
+    m.login()
+    ch = input("Enter 0 to quit or enter the mobile number followed by the msg to sent: ")
+    while ch != "0":
+        mobile_number, content = ch.split(" ", 1)
+        print(m.send_message(mobile_number, content))
+        ch = input("Enter 0 to quit or enter the mobile number followed by the msg to sent: ")
+

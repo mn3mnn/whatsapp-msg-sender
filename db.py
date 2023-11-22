@@ -88,13 +88,16 @@ class Account(BaseModel):
         return cls.select().where(cls.phone_number == phone_number).get()
 
     @classmethod
+    def get_account_name(cls, phone_number):
+        return cls.select().where(cls.phone_number == phone_number).get().name
+
+    @classmethod
     def get_all_accounts(cls):
         return cls.select()
 
     @classmethod
     def get_n_accounts(cls, n):
         return cls.select().limit(n)
-
 
 
 class User(BaseModel):
