@@ -74,7 +74,7 @@ class Messanger:
         try:
             message_input_selector = "div[role='textbox'][title='Type a message']"
             sent_msg_status_selector = 'span[data-icon="msg-check"]'
-            dlvrd_or_read_msg_status_selector = 'data-icon="[msg-dblcheck"]'
+            dlvrd_or_read_msg_status_selector = 'span[data-icon="msg-dblcheck"]'
 
             msg = quote(content)  # url-encode the message
 
