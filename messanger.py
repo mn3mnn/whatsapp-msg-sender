@@ -20,7 +20,7 @@ load_dotenv()  # take environment variables from example_for_dot_env.
 
 
 class Messanger:
-    def __init__(self, timeout_waiting=20, tab_name=None):
+    def __init__(self, timeout_waiting=40, tab_name=None):
         self.timeout_waiting = timeout_waiting  # timeout waiting for msg status to be sent
         self.tab_name = tab_name  # name of the tab
 
@@ -107,7 +107,7 @@ class Messanger:
 
             # wait until msg is sent and return status
             try:  # compare num of sent checkmarks and dlvrd checkmarks before and after sending the msg
-                WebDriverWait(self.driver, self.timeout_waiting)\
+                WebDriverWait(self.driver, 5 + self.timeout_waiting / 3)\
                     .until(lambda driver: len(driver.find_elements(By.CSS_SELECTOR, sent_msg_status_selector)) > n_sent_checkmarks
                                           or len(driver.find_elements(By.CSS_SELECTOR, dlvrd_or_read_msg_status_selector)) > n_dlvrd_or_read_checkmarks)
                 return SENT
