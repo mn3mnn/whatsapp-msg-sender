@@ -21,7 +21,7 @@ def main():
         except Exception as e:
             pass
 
-    for i in range(1):
+    for i in range(n_accounts):
         try:
             mobile_number = str(input(f"Enter mobile number of account {i+1}: "))
             manager.add_account(mobile_number, timeout)
