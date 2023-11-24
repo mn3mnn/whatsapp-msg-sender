@@ -86,7 +86,7 @@ def send_message():
 
         try:
             msg = Message.add_new_message(content, mobile_number)
-            added_to_q = append_msg_to_queue(msg.id)
+            added_to_q = append_msg_to_queue(msg)
             if not msg or not added_to_q:
                 response_json = get_json_response(success=False, error="error, couldn't add the message")
                 return jsonify(response_json), 500
