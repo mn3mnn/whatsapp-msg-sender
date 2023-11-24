@@ -9,11 +9,11 @@ from constant import SENT, FAILED, TIMEOUT
 from response import send_status_response_to_user
 
 import logging
-
-# Configure logging
-log_file_path = 'msgs_status.log'
-logging.basicConfig(filename=log_file_path, level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s',
-                    datefmt='%Y-%m-%d %H:%M:%S %Z')
+#
+# # Configure logging
+# log_file_path = 'msgs_status.log'
+# logging.basicConfig(filename=log_file_path, level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s',
+#                     datefmt='%Y-%m-%d %H:%M:%S %Z')
 
 
 class Account(Thread):
@@ -31,11 +31,13 @@ class Account(Thread):
 
     def run(self):  # this method will be called when the thread starts
         while self.accepting_msgs:
+            print('waiting for login')
             while not self.is_logged_in():
                 self.login()
             print(f"logged in to {self.name} ({self.phone_number})")
 
             if self.msgs_queue:
+                print('popping msg from acc queue')
                 msg = self.msgs_queue.pop(0)
 
                 try:
@@ -52,6 +54,8 @@ class Account(Thread):
                 elif status == "failed" or status == "timeout":
                     msg.status = status
                     msg.save()
+
+                print(f"message {msg},  status: {status}")
 
                 send_status_response_to_user(msg)
 

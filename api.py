@@ -1,23 +1,19 @@
-import datetime
 import json
 import os
-
-from urllib.parse import unquote  # Import the unquote function for URL decoding
-
-from flask import Flask, request, jsonify
-from urls import *
 import logging
 import uuid
+import datetime
+from urllib.parse import unquote
 
-from manager import get_manager
+from flask import Flask, request, jsonify
+
+from db import Message
+from urls import *
 from constant import API_KEYS
-
+from redis_conn import append_msg_to_queue
 
 app = Flask(__name__)
 
-manager = get_manager()
-
-# Configure logging
 log_file_path = 'incoming_requests.log'
 logging.basicConfig(filename=log_file_path, level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s',
                     datefmt='%Y-%m-%d %H:%M:%S %Z')
@@ -58,18 +54,6 @@ def get_msg_json(msg):
     return msg_json
 
 
-#
-# while '%' in content and content.index('%') < len(content) - 2:
-#     parts = content.split('%', 1)
-#     non_encoded_part = parts[0]
-#     encoded_part = parts[1][:2]  # Take the first two characters representing the encoded part
-#     url_encoded_part = parts[1][2:]  # Take the rest of the encoded part
-#     # Decode the URL-encoded part
-#     decoded_url_part = unquote(encoded_part) + url_encoded_part
-#     # Combine non-encoded part and decoded URL part
-#     content = non_encoded_part + decoded_url_part
-
-
 @app.route(SEND_MSG_ROUTE, methods=['POST', 'GET'])
 def send_message():
     try:
@@ -84,7 +68,6 @@ def send_message():
         req_id = str(uuid.uuid4())
 
         try:
-            # Log incoming request
             print(f'\nIncoming request: {datetime.datetime.utcnow()} {request.method} - JSON: {request.json}\n')
             logging.info(f'\nIncoming request: {req_id} {request.method} {request.url} - JSON: {request.json}\n')
         except Exception as e:
@@ -98,23 +81,20 @@ def send_message():
             response_json = get_json_response(success=False, error='Unauthorized')
             return jsonify(response_json), 401
 
-        # Check if the message contains URL-encoded links and decode them
         if '%' in content:
             content = unquote(content)
 
-        try:  # Insert message into the database
-            msg = manager.save_msg_to_db(content, mobile_number)
-
-            if not msg:
-                response_json = get_json_response(success=False, error="db error, couldn't send the message")
+        try:
+            msg = Message.add_new_message(content, mobile_number)
+            added_to_q = append_msg_to_queue(msg.id)
+            if not msg or not added_to_q:
+                response_json = get_json_response(success=False, error="error, couldn't add the message")
                 return jsonify(response_json), 500
 
-            manager.append_msg_to_queue(msg)
-
             msg_json = get_msg_json(msg)
-            response_json = get_json_response(msg=msg_json.copy())
+            response_json = get_json_response(msg=msg_json)
 
-            try:  # Log the response that is sent to the client
+            try:
                 logging.info(f'\nResponse: {req_id} {json.dumps(response_json)}\n')
             except Exception as e:
                 pass
@@ -132,4 +112,3 @@ def send_message():
 
 if __name__ == '__main__':
     app.run(debug=True)  # port=5000
-

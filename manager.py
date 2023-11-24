@@ -1,10 +1,13 @@
 import time
+
 from constant import SENT, TIMEOUT, FAILED
 from db import *
 from account import Account
 from urls import *
 from response import send_status_response_to_user
-from threading import Thread
+from threading import Thread, Event
+
+from redis_conn import pop_msg_from_queue
 
 
 class Manager:
@@ -13,7 +16,7 @@ class Manager:
         self.messages_queue = []
         self.pending_messages = []
         self.thread = None
-        self.keep_running = True
+        self.stop_event = Event()  # Event to stop the thread
 
     def add_account(self, phone_num):
         AccountDB.add_account(phone_num)
@@ -21,25 +24,19 @@ class Manager:
         print(f'added account {phone_num}')
         return True
 
-    def save_msg_to_db(self, content, mobile_number):
-        try:
-            msg = Message.add_new_message(content, mobile_number)
-            return msg
-        except Exception as e:
-            print(e)
-            return None
-
     def append_msg_to_queue(self, msg: Message):
         self.messages_queue.append(msg)
 
     def wait_for_new_msgs_in_q_and_append_to_acc_q(self):
-        while self.keep_running:  # distribute messages in q to logged_in accounts evenly
+        while not self.stop_event.is_set():
             try:
                 for i in range(len(self.accounts)):
                     if self.accounts[i].is_logged_in() and self.accounts[i].is_enabled():
-                        if self.messages_queue:
-                            msg = self.messages_queue.pop(0)
-                            print('appending msg' + str(msg) + 'to account' + str(self.accounts[i]))
+                        print(f'account {self.accounts[i]} is logged in and enabled')
+                        msg = pop_msg_from_queue()
+                        print(f'got msg {msg} from queue')
+                        if msg:
+                            print(f'appending msg {msg} to account {self.accounts[i]}')
                             self.accounts[i].append_msg_to_queue(msg)
                     else:
                         continue
@@ -50,6 +47,10 @@ class Manager:
     def run(self):
         self.thread = Thread(target=self.wait_for_new_msgs_in_q_and_append_to_acc_q)
         self.thread.start()
+
+    def stop(self):
+        self.stop_event.set()  # Set the event to stop the thread
+        self.thread.join()
 
     def __del__(self):
         self.keep_running = False
@@ -75,6 +76,7 @@ def get_manager():
     global manager_
     if manager_ is None:
         manager_ = Manager()
+        print('manager created')
 
     return manager_
 
