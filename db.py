@@ -30,12 +30,18 @@ class Message(BaseModel):
 
     @classmethod
     def add_new_message(cls, content, mobile_number):
-        msg = cls.create(content=content, mobile_number=mobile_number)
-        return msg
+        try:
+            msg = cls.create(content=content, mobile_number=mobile_number)
+            return msg
+        except Exception:
+            return None
 
     @classmethod
     def get_msg(cls, msg_id):
-        return cls.select().where(cls.id == msg_id).get()
+        try:
+            return cls.select().where(cls.id == msg_id).get()
+        except DoesNotExist:
+            return None
 
     @classmethod
     def get_messages_by_status(cls, status):
@@ -43,35 +49,53 @@ class Message(BaseModel):
 
     @classmethod
     def get_status(cls, msg_id):
-        msg = cls.select().where(cls.id == msg_id).get()
-        return msg.status
+        try:
+            return cls.select().where(cls.id == msg_id).get().status
+        except DoesNotExist:
+            return None
 
     @classmethod
     def set_msg_status(cls, msg_id, status):
-        msg = cls.select().where(cls.id == msg_id).get()
-        msg.status = status
-        msg.save()
+        try:
+            msg = cls.select().where(cls.id == msg_id).get()
+            msg.status = status
+            msg.save()
+            return True
+        except DoesNotExist:
+            return False
 
     @classmethod
     def set_msg_pending_at(cls, msg_id, pending_at):
-        msg = cls.select().where(cls.id == msg_id).get()
-        msg.pending_at = pending_at
-        msg.save()
+        try:
+            msg = cls.select().where(cls.id == msg_id).get()
+            msg.pending_at = pending_at
+            msg.save()
+            return True
+        except DoesNotExist:
+            return False
 
     @classmethod
     def set_msg_sent_at(cls, msg_id, sent_at):
-        msg = cls.select().where(cls.id == msg_id).get()
-        msg.sent_at = sent_at
-        msg.save()
+        try:
+            msg = cls.select().where(cls.id == msg_id).get()
+            msg.sent_at = sent_at
+            msg.save()
+            return True
+        except DoesNotExist:
+            return False
 
     @classmethod
     def set_msg_account_mobile_number(cls, msg_id, account_mobile_number):
-        msg = cls.select().where(cls.id == msg_id).get()
-        msg.account_mobile_number = account_mobile_number
-        msg.save()
+        try:
+            msg = cls.select().where(cls.id == msg_id).get()
+            msg.account_mobile_number = account_mobile_number
+            msg.save()
+            return True
+        except DoesNotExist:
+            return False
 
 
-class Account(BaseModel):
+class AccountDB(BaseModel):
     phone_number = CharField(primary_key=True, max_length=20)
     name = CharField(max_length=45, default=f"{phone_number}")
 
@@ -79,17 +103,26 @@ class Account(BaseModel):
         return f"Account: {self.name} ({self.phone_number})"
 
     @classmethod
-    def add_new_account(cls, phone_number, name=None):
-        account = cls.create(phone_number=phone_number, name=name or phone_number)
-        return account
+    def add_account(cls, phone_number, name=None):
+        try:
+            cls.create(phone_number=phone_number, name=name or phone_number)
+            return True
+        except IntegrityError:
+            return False
 
     @classmethod
     def get_account(cls, phone_number):
-        return cls.select().where(cls.phone_number == phone_number).get()
+        try:
+            return cls.select().where(cls.phone_number == phone_number).get()
+        except DoesNotExist:
+            return None
 
     @classmethod
     def get_account_name(cls, phone_number):
-        return cls.select().where(cls.phone_number == phone_number).get().name
+        try:
+            return cls.select().where(cls.phone_number == phone_number).get().name
+        except DoesNotExist:
+            return None
 
     @classmethod
     def get_all_accounts(cls):
@@ -110,16 +143,23 @@ class User(BaseModel):
 
     @classmethod
     def add_new_user(cls, user_key, name=None):
-        user = cls.create(user_key=user_key, name=name)
-        return user
+        try:
+            cls.create(user_key=user_key, name=name or user_key)
+            return True
+        except IntegrityError:
+            return False
 
     @classmethod
     def get_user(cls, user_key):
-        return cls.select().where(cls.user_key == user_key).get()
+        try:
+            return cls.select().where(cls.user_key == user_key).get()
+        except DoesNotExist:
+            return None
 
 
 if __name__ == "__main__":
-    db.create_tables([Message])  # create tables if not exists
+    # pass
+    db.create_tables([Message, AccountDB, User])  # create tables if not exists
 
     # uncomment the below line to add new message to db, then run this file
     # Message.add_new_message("Hello", "0123456789")

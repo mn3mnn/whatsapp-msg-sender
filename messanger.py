@@ -14,17 +14,18 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.wait import WebDriverWait
 
 from db import *
+from constant import SENT, FAILED, TIMEOUT
 
 load_dotenv()  # take environment variables from example_for_dot_env.
 
 
 class Messanger:
-    def __init__(self, timeout_waiting=20):
+    def __init__(self, timeout_waiting=20, tab_name=None):
         self.timeout_waiting = timeout_waiting  # timeout waiting for msg status to be sent
+        self.tab_name = tab_name  # name of the tab
 
         firefox_options = Options()
         # firefox_options.set_preference("permissions.default.image", 2)  # 2 means block images
-
 
         ff_profile = webdriver.FirefoxProfile('profile')
 
@@ -64,10 +65,18 @@ class Messanger:
     def login(self):  # open whatsapp web and wait until the qr code is scanned
         try:
             self.driver.get("https://web.whatsapp.com")
+            time.sleep(1)
+
+            if self.tab_name:
+                # Use JavaScript to set the title of the web page to <tab_name>
+                self.driver.execute_script(f"document.title = '## {self.tab_name} ##';")
+
             while not self.is_logged_in():
                 time.sleep(0.5)
             return True
-        except:
+
+        except Exception as e:
+            print(e)
             return False
 
     def send_message(self, mobile_number, content):
@@ -82,11 +91,11 @@ class Messanger:
 
             self.driver.get(url)
 
-            try: # wait until the message input in the chat is loaded
+            try:  # wait until the message input in the chat is loaded
                 WebDriverWait(self.driver, self.timeout_waiting)\
                     .until(EC.presence_of_element_located((By.CSS_SELECTOR, message_input_selector)))
             except:
-                return "timeout"
+                return TIMEOUT
 
             n_sent_checkmarks = len(self.driver.find_elements(By.CSS_SELECTOR, sent_msg_status_selector))
             print(n_sent_checkmarks)
@@ -101,15 +110,14 @@ class Messanger:
                 WebDriverWait(self.driver, self.timeout_waiting)\
                     .until(lambda driver: len(driver.find_elements(By.CSS_SELECTOR, sent_msg_status_selector)) > n_sent_checkmarks
                                           or len(driver.find_elements(By.CSS_SELECTOR, dlvrd_or_read_msg_status_selector)) > n_dlvrd_or_read_checkmarks)
-                return "sent"
+                return SENT
             except Exception as e:
                 print(e)
-                return "timeout"
-
+                return TIMEOUT
 
         except Exception as e:
             print(e)
-            return "failed"
+            return FAILED
 
 
 if __name__ == "__main__":
