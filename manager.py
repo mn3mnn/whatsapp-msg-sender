@@ -1,11 +1,9 @@
 import time
+from threading import Thread, Event
 
 from constant import SENT, TIMEOUT, FAILED
 from db import *
 from account import Account
-from urls import *
-from response import send_status_response_to_user
-from threading import Thread, Event
 
 from redis_conn import pop_msg_from_queue
 

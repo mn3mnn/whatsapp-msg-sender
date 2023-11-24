@@ -10,6 +10,7 @@ from flask import Flask, request, jsonify
 from db import Message
 from urls import *
 from constant import API_KEYS
+
 from redis_conn import append_msg_to_queue
 
 app = Flask(__name__)

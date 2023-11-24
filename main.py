@@ -1,6 +1,4 @@
 import sys
-from threading import Thread
-# from api import app
 from manager import get_manager
 
 manager = get_manager()
@@ -33,7 +31,6 @@ def main():
             i -= 1
 
     manager.run()
-    # app.run(debug=True)  # port=5000
 
 
 if __name__ == "__main__":

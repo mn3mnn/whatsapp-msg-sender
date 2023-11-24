@@ -1,14 +1,13 @@
 import time
 from threading import Thread
+from datetime import datetime
+import logging
 
 from db import *
 from messanger import Messanger
-from datetime import datetime
-
 from constant import SENT, FAILED, TIMEOUT
 from response import send_status_response_to_user
 
-import logging
 
 # Configure logging
 log_file_path = 'msgs_status.log'
@@ -49,13 +48,14 @@ class Account(Thread):
                     pass
 
                 status = self.send_msg(msg)
-                if status == "sent":
-                    msg.status = "sent"
-                    msg.sent_at = datetime.now()
-                    msg.save()
-                elif status == "failed" or status == "timeout":
-                    msg.status = status
-                    msg.save()
+
+                if status == SENT:
+                    msg.sent_at = datetime.utcnow()
+                elif status == FAILED or status == TIMEOUT:
+                    pass
+
+                msg.status = status
+                msg.save()
 
                 print(f"message {msg},  status: {status}")
 

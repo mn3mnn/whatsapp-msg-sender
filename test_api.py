@@ -12,7 +12,7 @@ send_msg_url = f'http://127.0.0.1:5000' + SEND_MSG_ROUTE
 for i in range(2):
     data = {
         'key': API_KEYS[0],
-        'message': f'hello here is a link https://facebook.com/  testNum: {i}',
+        'message': f'السلام عليكم hello here is a link https://facebook.com/ testNum: {i}',
         'number': '201122960525',
         'type': 'whatsapp'
     }

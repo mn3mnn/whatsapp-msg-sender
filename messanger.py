@@ -112,31 +112,13 @@ class Messanger:
 
             return SENT
 
-            # n_sent_checkmarks = len(self.driver.find_elements(By.CSS_SELECTOR, sent_msg_status_selector))
-            # print(n_sent_checkmarks)
-            # n_dlvrd_or_read_checkmarks = len(self.driver.find_elements(By.CSS_SELECTOR, dlvrd_or_read_msg_status_selector))
-            # print(n_dlvrd_or_read_checkmarks)
-            #
-            # time.sleep(random.uniform(0, 0.3))  # sleep random time between 0 and 0.3 seconds
-            # self.driver.find_element(By.CSS_SELECTOR, message_input_selector).send_keys(Keys.ENTER)
-            #
-            # # wait until msg is sent and return status
-            # try:  # compare num of sent checkmarks and dlvrd checkmarks before and after sending the msg
-            #     WebDriverWait(self.driver, 5 + self.timeout_waiting / 3)\
-            #         .until(lambda driver: len(driver.find_elements(By.CSS_SELECTOR, sent_msg_status_selector)) > n_sent_checkmarks
-            #                               or len(driver.find_elements(By.CSS_SELECTOR, dlvrd_or_read_msg_status_selector)) > n_dlvrd_or_read_checkmarks)
-            #     return SENT
-            # except Exception as e:
-            #     print(e)
-            #     return TIMEOUT
-
         except Exception as e:
             print(e)
             return FAILED
 
 
 if __name__ == "__main__":
-    m = Messanger()
+    m = Messanger(timeout_waiting=30)
     m.login()
     ch = input("Enter 0 to quit or enter the mobile number followed by the msg to sent: ")
     while ch != "0":
