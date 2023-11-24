@@ -20,14 +20,13 @@ load_dotenv()  # take environment variables from example_for_dot_env.
 
 
 class Messanger:
-    def __init__(self, timeout_waiting=40, tab_name=None):
+    def __init__(self, timeout_waiting, tab_name=None):
         self.timeout_waiting = timeout_waiting  # timeout waiting for msg status to be sent
         self.tab_name = tab_name  # name of the tab
 
         firefox_options = Options()
-        # firefox_options.set_preference("permissions.default.image", 2)  # 2 means block images
-
-        ff_profile = webdriver.FirefoxProfile('profile')
+        firefox_options.set_preference("permissions.default.image", 2)  # 2 means block images
+        # ff_profile = webdriver.FirefoxProfile('profile')
 
         if platform.system() == "Linux":
             self.driver = webdriver.Firefox(options=firefox_options)
@@ -37,8 +36,7 @@ class Messanger:
 
             self.driver = webdriver.Firefox(executable_path=geckodriver_path,
                                             firefox_binary=firefox_binary,
-                                            options=firefox_options,
-                                            firefox_profile=ff_profile)
+                                            options=firefox_options)
 
         self.driver.maximize_window()
         self.wait5 = WebDriverWait(self.driver, 5)

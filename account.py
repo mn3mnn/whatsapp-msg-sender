@@ -9,23 +9,27 @@ from constant import SENT, FAILED, TIMEOUT
 from response import send_status_response_to_user
 
 import logging
-#
-# # Configure logging
-# log_file_path = 'msgs_status.log'
-# logging.basicConfig(filename=log_file_path, level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s',
-#                     datefmt='%Y-%m-%d %H:%M:%S %Z')
+
+# Configure logging
+log_file_path = 'msgs_status.log'
+logging.basicConfig(filename=log_file_path, level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s',
+                    datefmt='%Y-%m-%d %H:%M:%S %Z')
+
+
+DEFAULT_TIMEOUT_WAITING = 30
 
 
 class Account(Thread):
-    def __init__(self, phone_number, name=None):
+    def __init__(self, phone_number, name=None, timeout_waiting=None):
         super().__init__(name)
         self.phone_number = phone_number
         self.name = name or phone_number
+        self.timeout_waiting = timeout_waiting or DEFAULT_TIMEOUT_WAITING
 
         self.accepting_msgs = True
         self.msgs_queue = []
 
-        self.messanger = Messanger(tab_name=self.name)
+        self.messanger = Messanger(timeout_waiting=self.timeout_waiting, tab_name=self.name)
 
         self.start()  # start the thread
 
