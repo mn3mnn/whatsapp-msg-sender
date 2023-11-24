@@ -24,17 +24,12 @@ class Manager:
         print(f'added account {phone_num}')
         return True
 
-    def append_msg_to_queue(self, msg: Message):
-        self.messages_queue.append(msg)
-
     def wait_for_new_msgs_in_q_and_append_to_acc_q(self):
         while not self.stop_event.is_set():
             try:
                 for i in range(len(self.accounts)):
                     if self.accounts[i].is_logged_in() and self.accounts[i].is_enabled():
-                        print(f'account {self.accounts[i]} is logged in and enabled')
                         msg = pop_msg_from_queue()
-                        print(f'got msg {msg} from queue')
                         if msg:
                             print(f'appending msg {msg} to account {self.accounts[i]}')
                             self.accounts[i].append_msg_to_queue(msg)

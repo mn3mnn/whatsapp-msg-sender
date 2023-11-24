@@ -26,7 +26,6 @@ def pop_msg_from_queue():
             print(f'Got msg {msg} from messages_queue')
             return msg
         else:
-            print('No messages in messages_queue')
             return None
 
     except Exception as e:
