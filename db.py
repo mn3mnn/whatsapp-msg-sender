@@ -6,7 +6,7 @@ from datetime import datetime
 
 load_dotenv()
 
-db = connect(getenv("DATABASE_URL"))
+db = connect(getenv("DATABASE_URL"), max_connections=10)
 
 
 class BaseModel(Model):
