@@ -31,10 +31,8 @@ class Account(Thread):
 
     def run(self):  # this method will be called when the thread starts
         while self.accepting_msgs:
-            print('waiting for login')
             while not self.is_logged_in():
                 self.login()
-            print(f"logged in to {self.name} ({self.phone_number})")
 
             if self.msgs_queue:
                 print('popping msg from acc queue')
