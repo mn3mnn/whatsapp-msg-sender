@@ -8,12 +8,14 @@ from constant import API_KEYS
 # send_msg_url = f'http://185.182.184.191' + SEND_MSG_ROUTE
 send_msg_url = f'http://127.0.0.1:5000' + SEND_MSG_ROUTE
 
+while True:
+    msg = input('Enter msg: ')
+    number = input('Enter number: ')
 
-for i in range(2):
     data = {
         'key': API_KEYS[0],
-        'message': f'السلام عليكم hello here is a link https://facebook.com/ testNum: {i}',
-        'number': '201122960525',
+        'message': msg,
+        'number': number,
         'type': 'whatsapp'
     }
     response = requests.post(send_msg_url, json=data)
