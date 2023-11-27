@@ -23,16 +23,22 @@ class Manager:
         return True
 
     def wait_for_new_msgs_in_q_and_append_to_acc_q(self):
-        while not self.stop_event.is_set():
+        acc_index = 0
+        while not self.stop_event.is_set() and len(self.accounts) > 0:
             try:
-                for i in range(len(self.accounts)):
-                    if self.accounts[i].is_logged_in() and self.accounts[i].is_enabled():
-                        msg = pop_msg_from_queue()
-                        if msg:
-                            print(f'appending msg {msg} to account {self.accounts[i]}')
-                            self.accounts[i].append_msg_to_queue(msg)
-                    else:
-                        continue
+                msg = pop_msg_from_queue()
+                if msg:
+                    while not self.accounts[acc_index].is_logged_in() or not self.accounts[acc_index].is_enabled():
+                        acc_index = (acc_index + 1) % len(self.accounts)
+
+                    self.accounts[acc_index].append_msg_to_queue(msg)
+                    acc_index = (acc_index + 1) % len(self.accounts)
+
+                    print(f'Appended msg {msg} to account {self.accounts[acc_index].phone_number} queue')
+
+                else:
+                    continue
+
             except Exception as e:
                 print(e)
                 continue
@@ -73,3 +79,8 @@ def get_manager():
 
     return manager_
 
+
+if __name__ == '__main__':
+    manager_ = get_manager()
+    manager_.accounts = [0, 1, 2, 3, 4]
+    manager_.wait_for_new_msgs_in_q_and_append_to_acc_q()
