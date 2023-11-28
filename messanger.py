@@ -38,7 +38,7 @@ class Messanger:
         # firefox_options.add_argument("--disable-gpu")
 
         # ff_profile = webdriver.FirefoxProfile('profile')
-
+        print(platform.system())
         if platform.system() == "Linux":
             self.driver = webdriver.Firefox(options=firefox_options)
         elif platform.system() == "Windows":
