@@ -5,13 +5,15 @@ import json
 import platform
 from dotenv import load_dotenv
 from urllib.parse import quote  # Uncomment line below to use python 3
-
 from selenium import webdriver
-from selenium.webdriver import Keys
-from selenium.webdriver.common.by import By
 from selenium.webdriver.firefox.options import Options
+from selenium.webdriver.firefox.service import Service as GeckoService
+from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.support.wait import WebDriverWait
+
+from webdriver_manager.firefox import GeckoDriverManager
+from selenium.webdriver.common.by import By
+from selenium.webdriver.common.keys import Keys
 
 from db import *
 from constant import SENT, FAILED, TIMEOUT
@@ -38,16 +40,12 @@ class Messanger:
         # firefox_options.add_argument("--disable-gpu")
 
         # ff_profile = webdriver.FirefoxProfile('profile')
-        print(platform.system())
-        if platform.system() == "Linux":
-            self.driver = webdriver.Firefox(options=firefox_options)
-        elif platform.system() == "Windows":
-            geckodriver_path = os.getenv('GECKODRIVER_PATH')
-            firefox_binary = os.getenv('FIREFOX_BIN')
 
-            self.driver = webdriver.Firefox(executable_path=geckodriver_path,
-                                            firefox_binary=firefox_binary,
-                                            options=firefox_options)
+        executable_path = GeckoDriverManager().install()
+
+        gecko_service = GeckoService(executable_path=executable_path)
+
+        self.driver = webdriver.Firefox(service=gecko_service, options=firefox_options)
 
         self.driver.maximize_window()
         self.wait5 = WebDriverWait(self.driver, 5)
