@@ -73,6 +73,10 @@ class Account(Thread):
             self.messanger.driver.quit()
         except:
             pass
+        try:
+            db.close()
+        except:
+            pass
 
     def login(self):  # open whatsapp web and wait until the qr code is scanned
         self.messanger.login()

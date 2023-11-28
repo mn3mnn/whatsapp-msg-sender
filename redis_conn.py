@@ -1,13 +1,13 @@
 import redis
 import pickle
-from db import Message
+# from db import Message
 
 
 # Connect to a local Redis server
 redis_conn = redis.StrictRedis(host='localhost', port=6379, db=0)
 
 
-def append_msg_to_queue(msg: Message):
+def append_msg_to_queue(msg):  # msg is a Message object
     try:
         msg = pickle.dumps(msg)
         redis_conn.rpush('messages_queue', msg)
@@ -22,7 +22,7 @@ def pop_msg_from_queue():
     try:
         msg = redis_conn.lpop('messages_queue')
         if msg:
-            msg = pickle.loads(msg)
+            msg = pickle.loads(msg)  # msg is a Message object
             print(f'Got msg {msg} from messages_queue')
             return msg
         else:

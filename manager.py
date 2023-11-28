@@ -17,7 +17,8 @@ class Manager:
         self.stop_event = Event()  # Event to stop the thread
 
     def add_account(self, phone_num, timout_waiting):
-        AccountDB.add_account(phone_num)
+        with db.atomic():
+            AccountDB.add_account(phone_num)
         self.accounts.append(Account(phone_num, timeout_waiting=timout_waiting))
         print(f'added account {phone_num}')
         return True
@@ -54,6 +55,7 @@ class Manager:
     def __del__(self):
         self.keep_running = False
         self.thread.join()
+        db.close()
 
     def disable_account(self, phone_num):
         for account in self.accounts:

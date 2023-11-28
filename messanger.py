@@ -15,7 +15,6 @@ from webdriver_manager.firefox import GeckoDriverManager
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 
-from db import Message
 from constant import SENT, FAILED, TIMEOUT
 
 load_dotenv()  # take environment variables from example_for_dot_env.
@@ -114,8 +113,8 @@ class Messanger:
             # wait until msg is sent or delivered and return status
             try:
                 WebDriverWait(self.driver, self.timeout_waiting / 2)\
-                    .until(lambda driver: driver.find_elements(By.CSS_SELECTOR, sent_msg_status_selector)
-                                          or driver.find_elements(By.CSS_SELECTOR, dlvrd_or_read_msg_status_selector))
+                    .until(lambda driver: msg_element.find_elements(By.CSS_SELECTOR, sent_msg_status_selector)
+                                          or msg_element.find_elements(By.CSS_SELECTOR, dlvrd_or_read_msg_status_selector))
             except Exception as e:
                 print(e)
                 return TIMEOUT

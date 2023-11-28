@@ -2,7 +2,7 @@ import json
 import requests
 import time
 
-from db import Message
+from db import Message, db
 from urls import SEND_RESPONSE_URL
 
 
@@ -25,3 +25,5 @@ def send_status_response_to_user(msg: Message):
     except:
         print(f"Failed to send status response for msg:{msg}")
         pass
+
+    db.close()

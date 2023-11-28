@@ -164,3 +164,4 @@ if __name__ == "__main__":
 
     # uncomment the below line to add new message to db, then run this file
     # Message.add_new_message("Hello", "0123456789")
+
