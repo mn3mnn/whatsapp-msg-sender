@@ -25,7 +25,18 @@ class Messanger:
         self.tab_name = tab_name  # name of the tab
 
         firefox_options = Options()
+
         firefox_options.set_preference("permissions.default.image", 2)  # 2 means block images
+        # firefox_options.set_preference("image.webp.enabled", False)  # Disable webp images
+        # firefox_options.set_preference("browser.cache.disk.enable", True)
+        # firefox_options.set_preference('network.cookie.cookieBehavior', 2)  # Disable cookies
+
+        firefox_options.set_preference("general.useragent.override",
+                                       "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36")
+
+        # firefox_options.add_argument("--headless")
+        # firefox_options.add_argument("--disable-gpu")
+
         # ff_profile = webdriver.FirefoxProfile('profile')
 
         if platform.system() == "Linux":
@@ -70,7 +81,8 @@ class Messanger:
                 self.driver.execute_script(f"document.title = '## {self.tab_name} ##';")
 
             while not self.is_logged_in():
-                time.sleep(0.5)
+                time.sleep(1)
+
             return True
 
         except Exception as e:
@@ -122,7 +134,10 @@ if __name__ == "__main__":
     m.login()
     ch = input("Enter 0 to quit or enter the mobile number followed by the msg to sent: ")
     while ch != "0":
-        mobile_number, content = ch.split(" ", 1)
-        print(m.send_message(mobile_number, content))
-        ch = input("Enter 0 to quit or enter the mobile number followed by the msg to sent: ")
-
+        try:
+            mobile_number, content = ch.split(" ", 1)
+            print(m.send_message(mobile_number, content))
+            ch = input("Enter 0 to quit or enter the mobile number followed by the msg to sent: ")
+        except Exception as e:
+            print(e)
+            ch = input("Enter 0 to quit or enter the mobile number followed by the msg to sent: ")
