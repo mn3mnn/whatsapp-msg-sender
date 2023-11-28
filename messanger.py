@@ -15,7 +15,7 @@ from webdriver_manager.firefox import GeckoDriverManager
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 
-from db import *
+from db import Message
 from constant import SENT, FAILED, TIMEOUT
 
 load_dotenv()  # take environment variables from example_for_dot_env.

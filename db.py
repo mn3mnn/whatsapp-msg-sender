@@ -6,7 +6,7 @@ from datetime import datetime
 
 load_dotenv()
 
-db = connect(getenv("DATABASE_URL"), max_connections=10)
+db = connect(getenv("DATABASE_URL"), max_connections=11)
 
 
 class BaseModel(Model):
@@ -33,7 +33,8 @@ class Message(BaseModel):
         try:
             msg = cls.create(content=content, mobile_number=mobile_number)
             return msg
-        except Exception:
+        except Exception as e:
+            print(e)
             return None
 
     @classmethod

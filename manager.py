@@ -2,7 +2,7 @@ import time
 from threading import Thread, Event
 
 from constant import SENT, TIMEOUT, FAILED
-from db import *
+from db import db, Message, AccountDB
 from account import Account
 
 from redis_conn import pop_msg_from_queue

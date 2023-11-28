@@ -7,7 +7,7 @@ from urllib.parse import unquote
 
 from flask import Flask, request, jsonify
 
-from db import Message
+from db import Message, db
 from urls import *
 from constant import API_KEYS
 
@@ -86,8 +86,14 @@ def send_message():
             content = unquote(content)
 
         try:
-            msg = Message.add_new_message(content, mobile_number)
-            added_to_q = append_msg_to_queue(msg)
+            msg = None
+            added_to_q = False
+
+            with db.atomic():
+                msg = Message.add_new_message(content, mobile_number)
+            if msg:
+                added_to_q = append_msg_to_queue(msg)
+
             if not msg or not added_to_q:
                 response_json = get_json_response(success=False, error="error, couldn't add the message")
                 return jsonify(response_json), 500

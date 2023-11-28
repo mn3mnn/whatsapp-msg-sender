@@ -3,7 +3,7 @@ from threading import Thread
 from datetime import datetime
 import logging
 
-from db import *
+from db import db, Message
 from messanger import Messanger
 from constant import SENT, FAILED, TIMEOUT
 from response import send_status_response_to_user
@@ -49,13 +49,14 @@ class Account(Thread):
 
                 status = self.send_msg(msg)
 
-                if status == SENT:
-                    msg.sent_at = datetime.utcnow()
-                elif status == FAILED or status == TIMEOUT:
-                    pass
+                with db.atomic():
+                    if status == SENT:
+                        msg.sent_at = datetime.utcnow()
+                    elif status == FAILED or status == TIMEOUT:
+                        pass
 
-                msg.status = status
-                msg.save()
+                    msg.status = status
+                    msg.save()
 
                 print(f"message {msg},  status: {status}")
 
